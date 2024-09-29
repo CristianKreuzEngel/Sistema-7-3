@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject('User_Repository') private userRepository: typeof User) {}
+  constructor(@Inject('USERS_REPOSITORY') private userRepository: typeof User) {}
 
   async validateUser(login: string, pass: string): Promise<any> {
     const user = await this.userRepository.findOne({ where: { login } });
