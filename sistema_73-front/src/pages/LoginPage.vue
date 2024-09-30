@@ -11,6 +11,11 @@ export default defineComponent({
         password: ''
       } as ILogin,
     };
+  },
+  methods:{
+    onSubmit(){
+
+    }
   }
 });
 </script>
@@ -25,6 +30,7 @@ export default defineComponent({
     >
       <q-form
         class="q-gutter-md"
+        @submit="onSubmit"
       >
       <q-input
         outlined
