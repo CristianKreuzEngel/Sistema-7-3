@@ -1,20 +1,21 @@
-<script lang="ts">
+<script lang="js">
 import { defineComponent } from 'vue';
-import { ILogin } from 'components/models';
+import {auth} from '../services/auth'
 
 export default defineComponent({
   name: 'LoginPage',
   data: () => {
     return {
       form: {
-        username: '',
+        login: '',
         password: ''
-      } as ILogin,
+      }
     };
   },
   methods:{
-    onSubmit(){
-
+    async onSubmit(){
+        await auth.makeLogin(this.form);
+        await this.$router.push('/');
     }
   }
 });
@@ -35,7 +36,7 @@ export default defineComponent({
       <q-input
         outlined
         label="Username"
-        v-model="form.username"
+        v-model="form.login"
         type="text"
       />
       <q-input

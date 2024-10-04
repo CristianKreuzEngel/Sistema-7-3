@@ -1,6 +1,6 @@
-# Sistema 7:3 (sistema-73-front)
+# Sistema 73 (sistema-73-front)
 
-Projeto de ordens de serviço
+A Quasar Project
 
 ## Install the dependencies
 ```bash

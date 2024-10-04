@@ -12,10 +12,10 @@
         />
 
         <q-toolbar-title>
-          Sistema 7:3
+          Quasar App
         </q-toolbar-title>
 
-        <div>Sistema 7:3 v{{ $q.version }}</div>
+        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
@@ -45,11 +45,11 @@
   </q-layout>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
+<script>
+import { defineComponent, ref } from 'vue'
+import EssentialLink from 'components/EssentialLink.vue'
 
-const linksList: EssentialLinkProps[] = [
+const linksList = [
   {
     title: 'Docs',
     caption: 'quasar.dev',
@@ -92,7 +92,7 @@ const linksList: EssentialLinkProps[] = [
     icon: 'favorite',
     link: 'https://awesome.quasar.dev'
   }
-];
+]
 
 export default defineComponent({
   name: 'MainLayout',
@@ -110,8 +110,8 @@ export default defineComponent({
 
   methods: {
     toggleLeftDrawer () {
-      this.leftDrawerOpen = !this.leftDrawerOpen;
+      this.leftDrawerOpen = !this.leftDrawerOpen
     }
   }
-});
+})
 </script>

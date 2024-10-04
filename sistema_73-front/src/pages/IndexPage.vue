@@ -1,18 +1,17 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page class="flex flex-center">
+    <img
+      alt="Quasar logo"
+      src="~assets/quasar-logo-vertical.svg"
+      style="width: 200px; height: 200px"
+    >
   </q-page>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'IndexPage',
-
-  data () {
-    return {
-
-    };
-  }
+  name: 'IndexPage'
 });
 </script>
