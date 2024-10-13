@@ -14,8 +14,14 @@ export default defineComponent({
   },
   methods:{
     async onSubmit(){
-        await auth.makeLogin(this.form);
-        await this.$router.push('/');
+        await auth.makeLogin(this.form).then(async resp => {
+          console.log(resp)
+          if (resp.status === 200) {
+            await this.$router.push('/');
+          }else{
+            throw new Error(resp.statusText);
+          }
+        });
     }
   }
 });
