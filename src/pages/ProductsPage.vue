@@ -8,6 +8,11 @@
       bordered
       :loading="loading"
     >
+      <template v-slot:body-cell-isActive="props">
+        <q-td :props="props">
+          {{ props.row.isActive ? "Ativo" : "Inativo" }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <q-btn
@@ -28,17 +33,17 @@
       </template>
     </q-table>
 
-    <q-btn @click="openModal" label="ADICIONAR" color="primary" />
+    <q-btn @click="openModal" class="q-mt-md"  label="ADICIONAR" color="primary" />
 
-    <!-- Modal para adicionar/editar produto -->
     <q-dialog v-model="isOpen">
       <q-card>
         <q-card-section class="row items-center q-pb-none text-h6">
           {{ isEdit ? "Editar" : "Cadastrar" }} Produto
         </q-card-section>
         <q-card-section>
-          <q-form @submit="submitForm">
+          <q-form @submit="submitForm" class="q-my-md">
             <q-input
+              class="q-mt-md"
               outlined
               label="Nome"
               v-model="form.name"
@@ -46,40 +51,49 @@
               required
             />
             <q-input
+              class="q-mt-md"
               outlined
               label="Preço"
               v-model="form.price"
               type="number"
               required
             />
-            <q-input
+            <q-select
+              class="q-mt-md"
               outlined
+              :options="voltageOptions"
+              option-value="value"
+              option-label="label"
               label="Voltagem"
               v-model="form.voltage"
               type="text"
               required
             />
             <q-input
+              class="q-mt-md"
               outlined
               label="Código"
               v-model="form.cod"
               type="text"
               required
             />
-            <q-input
-              outlined
-              label="Imagem"
-              v-model="form.image"
-              type="file"
-              @change="handleFileUpload"
-            />
-            <q-btn type="submit" label="Salvar" color="primary" />
+            <div>
+              <p>Imagem</p>
+              <input
+                type="file"
+                id="imageUpload"
+                accept="image/*"
+                @change="handleFileUpload"
+              />
+            </div>
+
+            <q-btn type="submit" label="Salvar" color="primary" class="q-mt-md" />
+
           </q-form>
         </q-card-section>
       </q-card>
     </q-dialog>
 
-    <!-- Confirmação de exclusão -->
     <q-dialog v-model="confirmDeleteDialog">
       <q-card>
         <q-card-section>
@@ -115,11 +129,16 @@ export default defineComponent({
       image: "",
     },
     file: null,
+    voltageOptions: [
+      { label: '110V', value: '110' },
+      { label: '220V', value: '220' }
+    ],
     columns: [
       { name: "name", label: "Nome", field: "name", sortable: true },
       { name: "price", label: "Preço", field: "price", sortable: true },
       { name: "voltage", label: "Voltagem", field: "voltage" },
       { name: "cod", label: "Código", field: "cod" },
+      { name: "isActive", label: "Status", field: "isActive" },
       { name: "actions", label: "Ações", field: "actions", sortable: false },
     ],
   }),
@@ -140,12 +159,16 @@ export default defineComponent({
       this.form = { ...product };
     },
     async submitForm() {
+      const formdata = new FormData()
       if (this.isEdit) {
-        // Chamada API para editar o produto
         await product.updateProduct(this.form);
       } else {
-        // Chamada API para adicionar o produto
-        await product.addProduct(this.form);
+        formdata.append("name", this.form.name);
+        formdata.append("price", this.form.price);
+        formdata.append("voltage", this.form.voltage.value);
+        formdata.append("cod", this.form.cod);
+        formdata.append("file", this.file);
+        await product.createProduct(formdata);
       }
       this.getProducts();
       this.isOpen = false;
@@ -155,7 +178,7 @@ export default defineComponent({
       this.confirmDeleteDialog = true;
     },
     async deleteProduct() {
-      await product.deleteProduct(this.productToDelete.cod);
+      await product.deleteProduct(this.productToDelete.id);
       this.getProducts();
       this.confirmDeleteDialog = false;
     },

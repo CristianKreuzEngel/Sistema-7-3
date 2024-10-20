@@ -13,6 +13,20 @@ export default route(function (/* { store, ssrContext } */) {
 
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
+  router.beforeEach(async (to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      try {
+        await api.get('/auth/check-token', { withCredentials: true });
+        next();
+      } catch (error) {
+        console.error('Token inválido ou expirado:', error);
+        next('/login');
+      }
+    } else {
+      next();
+    }
+  });
+
 
   return Router
 })
