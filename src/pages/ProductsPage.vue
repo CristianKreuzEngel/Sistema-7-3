@@ -1,39 +1,41 @@
 <template>
   <div>
-    <q-table
-      :rows="products"
-      :columns="columns"
-      row-key="cod"
-      flat
-      bordered
-      :loading="loading"
-    >
-      <template v-slot:body-cell-isActive="props">
-        <q-td :props="props">
-          {{ props.row.isActive ? "Ativo" : "Inativo" }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-actions="props">
-        <q-td :props="props">
-          <q-btn
-            flat
-            dense
-            icon="edit"
-            @click="editProduct(props.row)"
-            color="blue"
-          />
-          <q-btn
-            flat
-            dense
-            icon="delete"
-            @click="confirmDelete(props.row)"
-            color="red"
-          />
-        </q-td>
-      </template>
-    </q-table>
+    <q-card class="q-ma-md" >
+      <q-table
+        :rows="products"
+        :columns="columns"
+        row-key="cod"
+        flat
+        bordered
+        :loading="loading"
+      >
+        <template v-slot:body-cell-isActive="props">
+          <q-td :props="props">
+            {{ props.row.isActive ? "Ativo" : "Inativo" }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <q-btn
+              flat
+              dense
+              icon="edit"
+              @click="editProduct(props.row)"
+              color="blue"
+            />
+            <q-btn
+              flat
+              dense
+              icon="delete"
+              @click="confirmDelete(props.row)"
+              color="red"
+            />
+          </q-td>
+        </template>
+      </q-table>
 
-    <q-btn @click="openModal" class="q-mt-md"  label="ADICIONAR" color="primary" />
+      <q-btn @click="openModal" class="q-ma-md"  label="ADICIONAR" color="primary" />
+    </q-card>
 
     <q-dialog v-model="isOpen">
       <q-card>
@@ -53,10 +55,11 @@
             <q-input
               class="q-mt-md"
               outlined
-              label="Preço"
               v-model="form.price"
-              type="number"
-              required
+              label="Preço"
+              mask="#.##"
+              reverse-fill-mask
+              input-class="text-right"
             />
             <q-select
               class="q-mt-md"
@@ -77,8 +80,17 @@
               type="text"
               required
             />
+            <q-input
+              v-if="isEdit"
+              class="q-mt-md"
+              outlined
+              label="Nome"
+              v-model="form.image"
+              type="text"
+              required
+            />
             <div>
-              <p>Imagem</p>
+              <p>{{ isEdit ? "Alterar a " : "" }} Imagem</p>
               <input
                 type="file"
                 id="imageUpload"
@@ -86,6 +98,22 @@
                 @change="handleFileUpload"
               />
             </div>
+
+            <div class="q-mt-md">
+              <q-radio
+                v-model="form.isActive"
+                :val="true"
+                label="Ativo"
+                color="green"
+              />
+              <q-radio
+                v-model="form.isActive"
+                :val="false"
+                label="Inativo"
+                color="red"
+              />
+            </div>
+
 
             <q-btn type="submit" label="Salvar" color="primary" class="q-mt-md" />
 
@@ -124,9 +152,10 @@ export default defineComponent({
     form: {
       name: "",
       price: 0,
-      voltage: "",
+      voltage: "220V",
       cod: "",
       image: "",
+      isActive: true,
     },
     file: null,
     voltageOptions: [
@@ -186,9 +215,10 @@ export default defineComponent({
       this.form = {
         name: "",
         price: 0,
-        voltage: "",
+        voltage: "220V",
         cod: "",
         image: "",
+        isActive: true,
       };
       this.file = null;
     },

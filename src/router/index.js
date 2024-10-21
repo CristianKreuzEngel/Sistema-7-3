@@ -1,6 +1,7 @@
 import { route } from 'quasar/wrappers'
 import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
 import routes from './routes'
+import {api} from "boot/axios";
 
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -13,7 +14,7 @@ export default route(function (/* { store, ssrContext } */) {
 
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
-  router.beforeEach(async (to, from, next) => {
+  Router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
       try {
         await api.get('/auth/check-token', { withCredentials: true });

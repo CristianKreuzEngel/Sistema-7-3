@@ -1,7 +1,7 @@
 <script lang="js">
 import { defineComponent } from 'vue';
 import { auth } from '../services/auth';
-import Cookies from 'js-cookie'; // Importe a biblioteca js-cookie
+import Cookies from 'js-cookie';
 
 export default defineComponent({
   name: 'LoginPage',
@@ -19,7 +19,6 @@ export default defineComponent({
         console.log(resp);
         if (resp.status === 200) {
           console.log('Login realizado com sucesso');
-          // Verifica o token no cookie
           console.log('Token no cookie:', Cookies.get('access_token')); // Agora o Cookies está definido
           await this.$router.push('/');
         } else {
