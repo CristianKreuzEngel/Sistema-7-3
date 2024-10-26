@@ -57,7 +57,7 @@ const linksList = [
   {
     title: 'Ordens',
     icon: 'list_alt',
-    link: 'https://github.com/quasarframework'
+    link: '/orders'
   },
   {
     title: 'Remessas',

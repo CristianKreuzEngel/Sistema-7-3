@@ -24,7 +24,6 @@ export const product = {
   },
   async updateProduct(data) {
     try {
-      console.log(data)
       return await api.patch(`/products/update-product/${data.id}`, data, { withCredentials: true });
     } catch (err) {
       throw err;
