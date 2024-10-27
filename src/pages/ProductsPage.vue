@@ -137,100 +137,150 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref, reactive, onMounted } from "vue";
 import { product } from "../services/products";
+import {useQuasar} from "quasar";
+import messages from "@intlify/vite-plugin-vue-i18n/messages";
 
 export default defineComponent({
   name: "ProductsPage",
-  data: () => ({
-    products: [],
-    isOpen: false,
-    isEdit: false,
-    loading: true,
-    confirmDeleteDialog: false,
-    productToDelete: null,
-    form: {
+  setup() {
+    const $q = useQuasar();
+    const products = ref([]);
+    const isOpen = ref(false);
+    const isEdit = ref(false);
+    const loading = ref(true);
+    const confirmDeleteDialog = ref(false);
+    const productToDelete = ref(null);
+    const file = ref(null);
+
+    const form = reactive({
       name: "",
       price: 0,
       voltage: "220V",
       cod: "",
       image: "",
       isActive: true,
-    },
-    file: null,
-    voltageOptions: [
+    });
+
+    const voltageOptions = [
       { label: '110V', value: '110' },
       { label: '220V', value: '220' }
-    ],
-    columns: [
+    ];
+
+    const columns = [
       { name: "name", label: "Nome", field: "name", sortable: true },
       { name: "price", label: "Preço", field: "price", sortable: true },
       { name: "voltage", label: "Voltagem", field: "voltage" },
       { name: "cod", label: "Código", field: "cod" },
       { name: "isActive", label: "Status", field: "isActive" },
       { name: "actions", label: "Ações", field: "actions", sortable: false },
-    ],
-  }),
-  methods: {
-    async getProducts() {
-      this.loading = true;
-      this.products = await product.getProducts();
-      this.loading = false;
-    },
-    openModal() {
-      this.isEdit = false;
-      this.isOpen = true;
-      this.resetForm();
-    },
-    editProduct(product) {
-      this.isEdit = true;
-      this.isOpen = true;
-      this.form = { ...product };
-    },
-    async submitForm() {
-      const formdata = new FormData()
-      if (this.isEdit) {
-        await product.updateProduct(this.form);
+    ];
+
+    const getProducts = async () => {
+      loading.value = true;
+      products.value = await product.getProducts();
+      loading.value = false;
+    };
+
+    const openModal = () => {
+      isEdit.value = false;
+      isOpen.value = true;
+      resetForm();
+    };
+
+    const editProduct = (product) => {
+      console.log(product);
+      isEdit.value = true;
+      isOpen.value = true;
+      Object.assign(form, product);
+    };
+
+    const submitForm = async () => {
+      const formData = new FormData();
+      if (isEdit.value) {
+        await product.updateProduct(form).then(resp => {
+          console.log('resp');
+          console.log(resp);
+          if( resp.data[0] === 1 ) {}
+          $q.notify({
+            type: 'positive',
+            message: 'Produto atualizado com sucesso!'
+          })
+        });
       } else {
-        formdata.append("name", this.form.name);
-        formdata.append("price", this.form.price);
-        formdata.append("voltage", this.form.voltage.value);
-        formdata.append("cod", this.form.cod);
-        formdata.append("file", this.file);
-        await product.createProduct(formdata);
+        formData.append("name", form.name);
+        formData.append("price", form.price);
+        formData.append("voltage", form.voltage);
+        formData.append("cod", form.cod);
+        formData.append("file", file.value);
+        await product.createProduct(formData).then(response => {
+          if(response.data.msg === 'Success'){
+            $q.notify({
+              type: 'positive',
+              message: 'Produto criado com sucesso!'
+            })
+          }
+        });
       }
-      this.getProducts();
-      this.isOpen = false;
-    },
-    confirmDelete(product) {
-      this.productToDelete = product;
-      this.confirmDeleteDialog = true;
-    },
-    async deleteProduct() {
-      await product.deleteProduct(this.productToDelete.id);
-      this.getProducts();
-      this.confirmDeleteDialog = false;
-    },
-    resetForm() {
-      this.form = {
+      await getProducts();
+      isOpen.value = false;
+    };
+
+    const confirmDelete = (product) => {
+      productToDelete.value = product;
+      confirmDeleteDialog.value = true;
+    };
+
+    const deleteProduct = async () => {
+      await product.deleteProduct(productToDelete.value.id);
+      await getProducts();
+      confirmDeleteDialog.value = false;
+    };
+
+    const resetForm = () => {
+      Object.assign(form, {
         name: "",
         price: 0,
         voltage: "220V",
         cod: "",
         image: "",
         isActive: true,
-      };
-      this.file = null;
-    },
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.file = file;
+      });
+      file.value = null;
+    };
+
+    const handleFileUpload = (event) => {
+      const uploadedFile = event.target.files[0];
+      if (uploadedFile) {
+        file.value = uploadedFile;
       }
-    },
-  },
-  mounted() {
-    this.getProducts();
+    };
+
+    onMounted(() => {
+      getProducts();
+    });
+
+    return {
+      products,
+      isOpen,
+      isEdit,
+      loading,
+      confirmDeleteDialog,
+      productToDelete,
+      form,
+      file,
+      voltageOptions,
+      columns,
+      getProducts,
+      openModal,
+      editProduct,
+      submitForm,
+      confirmDelete,
+      deleteProduct,
+      resetForm,
+      handleFileUpload,
+    };
   },
 });
 </script>

@@ -1,34 +1,47 @@
 <script lang="js">
-import { defineComponent } from 'vue';
+import { defineComponent, reactive } from 'vue';
 import { auth } from '../services/auth';
-import Cookies from 'js-cookie';
+import { useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'LoginPage',
-  data: () => {
-    return {
-      form: {
-        login: '',
-        password: ''
+  setup() {
+    const $q = useQuasar();
+    const router = useRouter();
+    const form = reactive({
+      login: '',
+      password: ''
+    });
+
+    const onSubmit = async () => {
+      try {
+        const resp = await auth.makeLogin(form);
+        console.log('estou if');
+        $q.notify({
+          type: 'positive',
+          message: 'Login efetuado com sucesso!'
+        });
+        await router.push('/');
+      } catch (err) {
+        console.log('to no catch ' + err.message);
+        $q.notify({
+          type: 'negative',
+          message: 'Login ou senha incorretos. Por favor verifique!'
+        });
       }
     };
-  },
-  methods: {
-    async onSubmit() {
-      await auth.makeLogin(this.form).then(async resp => {
-        console.log(resp);
-        if (resp.status === 200) {
-          console.log('Login realizado com sucesso');
-          console.log('Token no cookie:', Cookies.get('access_token')); // Agora o Cookies está definido
-          await this.$router.push('/');
-        } else {
-          throw new Error(resp.statusText);
-        }
-      });
-    }
+
+    return {
+      form,
+      onSubmit
+    };
   }
 });
 </script>
+
+
+
 
 <template>
   <div class="q-pa-md flex flex-center" style="height: 100vh;">

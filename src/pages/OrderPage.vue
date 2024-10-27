@@ -1,99 +1,139 @@
 <script>
-import {defineComponent, ref} from "vue";
+import { defineComponent, ref, reactive, onMounted } from "vue";
 import { order } from "../services/orders";
 
 export default defineComponent({
   name: "OrdersPage",
-  data: () => ({
-    maximizedToggle: ref(true),
-    orders: [],
-    isOpen: false,
-    isEdit: false,
-    loading: true,
-    confirmDeleteDialog: false,
-    productToDelete: null,
-    form: {
+  setup() {
+    const maximizedToggle = ref(true);
+    const orders = ref([]);
+    const isOpen = ref(false);
+    const isEdit = ref(false);
+    const loading = ref(true);
+    const confirmDeleteDialog = ref(false);
+    const productToDelete = ref(null);
+    const file = ref(null);
+
+    const form = reactive({
       name: "",
-      price: 0,
-      voltage: "220V",
-      cod: "",
-      image: "",
+      phone: "",
+      totalValue: 0,
+      accessories: "",
+      mistakes: "",
+      problemDescription: "",
+      technicalDescription: "",
+      equipment: "",
+      budget: false,
       isActive: true,
-    },
-    file: null,
-    voltageOptions: [
-      { label: '110V', value: '110' },
-      { label: '220V', value: '220' }
-    ],
-    columns: [
+    });
+
+    const equipmentOptions = [
+      { label: 'Celular', value: 'celular' },
+      { label: 'Computador', value: 'computador' },
+      { label: 'Notebook', value: 'notebook' },
+      { label: 'Outro', value: 'outro' },
+    ];
+
+    const columns = [
       { name: "name", label: "Nome", field: "name", sortable: true },
       { name: "price", label: "Preço", field: "price", sortable: true },
       { name: "voltage", label: "Voltagem", field: "voltage" },
       { name: "cod", label: "Código", field: "cod" },
       { name: "isActive", label: "Status", field: "isActive" },
       { name: "actions", label: "Ações", field: "actions", sortable: false },
-    ],
-  }),
-  methods: {
-    async getOrders() {
-      this.loading = true;
-      this.orders = await product.getOrders();
-      this.loading = false;
-    },
-    openModal() {
-      this.isEdit = false;
-      this.isOpen = true;
-      this.resetForm();
-    },
-    editProduct(product) {
-      this.isEdit = true;
-      this.isOpen = true;
-      this.form = { ...product };
-    },
-    async submitForm() {
-      const formdata = new FormData()
-      if (this.isEdit) {
-        await product.updateProduct(this.form);
+    ];
+
+    const getOrders = async () => {
+      loading.value = true;
+      orders.value = await order.getOrders();
+      loading.value = false;
+    };
+
+    const openModal = () => {
+      isEdit.value = false;
+      isOpen.value = true;
+      resetForm();
+    };
+
+    const editOrder = (selectedOrder) => {
+      isEdit.value = true;
+      isOpen.value = true;
+      Object.assign(form, selectedOrder);
+    };
+
+    const submitForm = async () => {
+      const formData = new FormData();
+      if (isEdit.value) {
+        await order.updateOrder(form);
       } else {
-        formdata.append("name", this.form.name);
-        formdata.append("price", this.form.price);
-        formdata.append("voltage", this.form.voltage.value);
-        formdata.append("cod", this.form.cod);
-        formdata.append("file", this.file);
-        await product.createProduct(formdata);
+        formData.append("name", form.name);
+        formData.append("price", form.totalValue);
+        formData.append("equipment", form.equipment);
+        formData.append("file", file.value);
+        await order.createOrder(formData);
       }
-      this.getOrders();
-      this.isOpen = false;
-    },
-    confirmDelete(product) {
-      this.productToDelete = product;
-      this.confirmDeleteDialog = true;
-    },
-    async deleteProduct() {
-      await product.deleteProduct(this.productToDelete.id);
-      this.getOrders();
-      this.confirmDeleteDialog = false;
-    },
-    resetForm() {
-      this.form = {
+      await getOrders();
+      isOpen.value = false;
+    };
+
+    const confirmDelete = (selectedOrder) => {
+      productToDelete.value = selectedOrder;
+      confirmDeleteDialog.value = true;
+    };
+
+    const deleteOrder = async () => {
+      await order.deleteOrder(productToDelete.value.id);
+      await getOrders();
+      confirmDeleteDialog.value = false;
+    };
+
+    const resetForm = () => {
+      Object.assign(form, {
         name: "",
-        price: 0,
-        voltage: "220V",
-        cod: "",
-        image: "",
+        phone: "",
+        totalValue: 0,
+        accessories: "",
+        problemDescription: "",
+        technicalDescription: "",
+        equipment: "",
+        budget: false,
         isActive: true,
-      };
-      this.file = null;
-    },
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.file = file;
+      });
+      file.value = null;
+    };
+
+    const handleFileUpload = (event) => {
+      const uploadedFile = event.target.files[0];
+      if (uploadedFile) {
+        file.value = uploadedFile;
       }
-    },
-  },
-  mounted() {
-    this.getOrders();
+    };
+
+    onMounted(() => {
+      getOrders();
+    });
+
+    return {
+      maximizedToggle,
+      orders,
+      isOpen,
+      isEdit,
+      loading,
+      confirmDeleteDialog,
+      productToDelete,
+      form,
+      file,
+      equipmentOptions,
+      columns,
+      getOrders,
+      openModal,
+      editOrder,
+      submitForm,
+      confirmDelete,
+      deleteOrder,
+      resetForm,
+      handleFileUpload,
+    };
   },
 });
 </script>
@@ -102,7 +142,7 @@ export default defineComponent({
 <template>
   <div>
     <q-card class="q-ma-md" >
-      <q-btn @click="openModal" class="q-ma-md"  icon="add_circle"  label="ADICIONAR" color="primary" />
+      <q-btn @click="openModal" class="q-ma-md"  icon="add_circle"  label="NOVA ORDEM" color="primary" />
       <q-table
         :rows="orders"
         :columns="columns"
@@ -165,7 +205,6 @@ export default defineComponent({
               v-model="form.name"
               type="text"
               required
-              style="width: 300px;" <!-- Defina a largura fixa aqui -->
             />
 
             <q-input
@@ -183,26 +222,25 @@ export default defineComponent({
               outlined
               rounded
               label="Descricao do problema"
-              v-model="form.desc"
+              v-model="form.problemDescription"
               type="textarea"
               required
             />
-            <q-input
+            <div class="q-mt-md">
+              <q-toggle
+                v-model="form.budget"
+                color="green"
+                label="Fazer orçamento"
+              />
+            </div>
+            <q-select
               class="q-mt-md"
               outlined
-              rounded
-              v-model="form.desc"
-              label="Preço"
-              mask="#.##"
-              reverse-fill-mask
-              input-class="text-right"
-            />
-            <q-input
-              class="q-mt-md"
-              outlined
-              rounded
-              label="Código"
-              v-model="form.cod"
+              :options="equipmentOptions"
+              option-value="value"
+              option-label="label"
+              label="Equipamento"
+              v-model="form.equipment"
               type="text"
               required
             />
