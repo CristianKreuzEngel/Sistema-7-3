@@ -140,8 +140,6 @@
 import { defineComponent, ref, reactive, onMounted } from "vue";
 import { product } from "../services/products";
 import {useQuasar} from "quasar";
-import messages from "@intlify/vite-plugin-vue-i18n/messages";
-
 export default defineComponent({
   name: "ProductsPage",
   setup() {

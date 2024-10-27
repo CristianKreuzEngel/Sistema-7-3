@@ -1,7 +1,7 @@
 import { api } from 'boot/axios';
 
 export const order = {
-  async getorders() {
+  async getOrders() {
     try {
       const orders = await api.get('/orders/get-all', { withCredentials: true })
       return orders.data;

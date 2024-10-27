@@ -6,6 +6,7 @@ const routes = [
       { path: '', component: () => import('pages/IndexPage.vue'), meta: { requiresAuth: true } },
       { path: '/products', component: () => import('pages/ProductsPage.vue'), meta: { requiresAuth: true } },
       { path: '/orders', component: () => import('pages/OrderPage.vue'), meta: { requiresAuth: true } },
+      { path: '/services', component: () => import('pages/ServicesPage.vue'), meta: { requiresAuth: true } },
     ]
   },
 

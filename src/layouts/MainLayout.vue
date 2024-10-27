@@ -35,6 +35,12 @@
           :key="link.title"
           v-bind="link"
         />
+
+        <q-btn
+          flat
+          label="Sair"
+          icon="logout"
+        />
       </q-list>
     </q-drawer>
 
@@ -58,6 +64,11 @@ const linksList = [
     title: 'Ordens',
     icon: 'list_alt',
     link: '/orders'
+  },
+  {
+    title: 'Serviços',
+    icon: 'design_services',
+    link: '/services'
   },
   {
     title: 'Remessas',
@@ -104,6 +115,9 @@ export default defineComponent({
   methods: {
     toggleLeftDrawer () {
       this.leftDrawerOpen = !this.leftDrawerOpen
+    },
+    async logout() {
+      await this.auth.logout();
     }
   }
 })
