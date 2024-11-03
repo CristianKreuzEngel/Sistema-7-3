@@ -66,35 +66,24 @@ const linksList = [
     link: '/orders'
   },
   {
-    title: 'Serviços',
-    icon: 'design_services',
-    link: '/services'
-  },
-  {
-    title: 'Remessas',
-    icon: 'receipt',
-    link: 'https://chat.quasar.dev'
-  },
-  {
     title: 'Pedidos',
     icon: 'feed',
     link: 'https://forum.quasar.dev'
   },
   {
-    title: 'Espelhos',
-    icon: 'import_contacts',
-    link: 'https://twitter.quasar.dev'
+    title: 'Clientes',
+    icon: 'receipt',
+    link: 'https://chat.quasar.dev'
+  },
+  {
+    title: 'Serviços',
+    icon: 'design_services',
+    link: '/services'
   },
   {
     title: 'Produtos',
     icon: 'inventory',
     link: '/products'
-  },
-
-  {
-    title: 'Informativos',
-    icon: 'notifications',
-    link: 'https://facebook.quasar.dev'
   },
 ]
 

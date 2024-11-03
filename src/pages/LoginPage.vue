@@ -17,14 +17,12 @@ export default defineComponent({
     const onSubmit = async () => {
       try {
         const resp = await auth.makeLogin(form);
-        console.log('estou if');
         $q.notify({
           type: 'positive',
           message: 'Login efetuado com sucesso!'
         });
         await router.push('/');
       } catch (err) {
-        console.log('to no catch ' + err.message);
         $q.notify({
           type: 'negative',
           message: 'Login ou senha incorretos. Por favor verifique!'
@@ -40,9 +38,6 @@ export default defineComponent({
 });
 </script>
 
-
-
-
 <template>
   <div class="q-pa-md flex flex-center" style="height: 100vh;">
     <q-card
@@ -55,6 +50,7 @@ export default defineComponent({
         class="q-gutter-md"
         @submit="onSubmit"
       >
+        <h3>FAÇA O LOGIN</h3>
       <q-input
         outlined
         label="Username"

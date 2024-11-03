@@ -18,14 +18,14 @@ export const Services = {
   },
   async updateService(data) {
     try {
-      return await api.patch(`/services/update-order/${data.id}`, data, { withCredentials: true });
+      return await api.patch(`/services/update-service/${data.id}`, data, { withCredentials: true });
     } catch (err) {
       throw err;
     }
   },
   async deleteService(id) {
     try {
-      return await api.delete(`/services/delete-order/${id}`, { withCredentials: true });
+      return await api.delete(`/services/delete-service/${id}`, { withCredentials: true });
     } catch (err) {
       throw err;
     }

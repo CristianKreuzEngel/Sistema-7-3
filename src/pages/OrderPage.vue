@@ -1,6 +1,7 @@
 <script>
 import { defineComponent, ref, reactive, onMounted } from "vue";
 import { order } from "../services/orders";
+import {Services} from "src/services/services";
 
 export default defineComponent({
   name: "OrdersPage",
@@ -13,6 +14,7 @@ export default defineComponent({
     const confirmDeleteDialog = ref(false);
     const productToDelete = ref(null);
     const file = ref(null);
+    const servicesOptions = ref([])
 
     const form = reactive({
       name: "",
@@ -46,6 +48,16 @@ export default defineComponent({
     const getOrders = async () => {
       loading.value = true;
       orders.value = await order.getOrders();
+      loading.value = false;
+    };
+
+    const getServices = async () => {
+      loading.value = true;
+      await Services.getServices().then(resp => {
+        resp.map(a =>{
+          servicesOptions.value.push({label: a.name, value: a.id});
+        })
+      });
       loading.value = false;
     };
 
@@ -96,6 +108,7 @@ export default defineComponent({
         problemDescription: "",
         technicalDescription: "",
         equipment: "",
+        idService: null,
         budget: false,
         isActive: true,
       });
@@ -111,6 +124,7 @@ export default defineComponent({
 
     onMounted(() => {
       getOrders();
+      getServices();
     });
 
     return {
@@ -124,6 +138,7 @@ export default defineComponent({
       form,
       file,
       equipmentOptions,
+      servicesOptions,
       columns,
       getOrders,
       openModal,
@@ -137,8 +152,6 @@ export default defineComponent({
   },
 });
 </script>
-
-
 <template>
   <div>
     <q-card class="q-ma-md" >
@@ -221,7 +234,7 @@ export default defineComponent({
               class="q-mt-md"
               outlined
               rounded
-              label="Descricao do problema"
+              label="Descrição do problema"
               v-model="form.problemDescription"
               type="textarea"
               required
@@ -236,6 +249,7 @@ export default defineComponent({
             <q-select
               class="q-mt-md"
               outlined
+              rounded
               :options="equipmentOptions"
               option-value="value"
               option-label="label"
@@ -244,40 +258,19 @@ export default defineComponent({
               type="text"
               required
             />
-            <q-input
-              v-if="isEdit"
+            <q-select
               class="q-mt-md"
               outlined
-              label="Nome"
-              v-model="form.image"
+              rounded
+              :options="servicesOptions"
+              option-value="value"
+              option-label="label"
+              label="Serviço"
+              v-model="form.idService"
               type="text"
               required
             />
-            <div>
-              <p>{{ isEdit ? "Alterar a " : "" }} Imagem</p>
-              <input
-                type="file"
-                id="imageUpload"
-                accept="image/*"
-                @change="handleFileUpload"
-              />
-            </div>
-
-            <div class="q-mt-md">
-              <q-radio
-                v-model="form.isActive"
-                :val="true"
-                label="Ativo"
-                color="green"
-              />
-              <q-radio
-                v-model="form.isActive"
-                :val="false"
-                label="Inativo"
-                color="red"
-              />
-            </div>
-            <q-btn type="submit" label="Salvar" color="primary" class="q-mt-md" />
+            <q-btn type="submit" rounded label="Salvar" color="primary" class="q-mt-md" />
           </q-form>
         </q-card-section>
       </q-card>
@@ -286,7 +279,7 @@ export default defineComponent({
     <q-dialog v-model="confirmDeleteDialog">
       <q-card>
         <q-card-section>
-          Tem certeza que deseja excluir o produto?
+          Tem certeza que deseja excluir a ordem?
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Cancelar" color="primary" v-close-popup />
