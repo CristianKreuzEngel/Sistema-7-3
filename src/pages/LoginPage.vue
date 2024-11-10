@@ -21,7 +21,7 @@ export default defineComponent({
           type: 'positive',
           message: 'Login efetuado com sucesso!'
         });
-        await router.push('/');
+        await router.push('/home');
       } catch (err) {
         $q.notify({
           type: 'negative',

@@ -16,7 +16,7 @@ export default defineComponent({
     const form = reactive({
       name: "",
       price: 0,
-      isActive: 1,
+      isActive: true,
     });
     const columns = [
       { name: "name", label: "Nome", field: "name", sortable: true },
@@ -67,7 +67,7 @@ export default defineComponent({
       Object.assign(form, {
         name: "",
         price: 0,
-        isActive: 1,
+        isActive: true,
       });
     };
     onMounted(() => {

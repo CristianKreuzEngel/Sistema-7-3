@@ -58,7 +58,7 @@ const linksList = [
   {
     title: 'Dashboard',
     icon: 'dashboard',
-    link: '/'
+    link: '/home'
   },
   {
     title: 'Ordens',
@@ -68,12 +68,12 @@ const linksList = [
   {
     title: 'Pedidos',
     icon: 'feed',
-    link: 'https://forum.quasar.dev'
+    link: '/requests'
   },
   {
     title: 'Clientes',
-    icon: 'receipt',
-    link: 'https://chat.quasar.dev'
+    icon: 'groups',
+    link: '/customers'
   },
   {
     title: 'Serviços',
