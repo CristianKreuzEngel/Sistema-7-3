@@ -1,7 +1,8 @@
 <script>
-import { defineComponent, ref, reactive, onMounted } from "vue";
+import {defineComponent, ref, reactive, onMounted, watch} from "vue";
 import { order } from "../services/orders";
-import {Services} from "src/services/services";
+import { Services } from "src/services/services";
+import jsPDF from "jspdf";
 
 export default defineComponent({
   name: "OrdersPage",
@@ -14,7 +15,7 @@ export default defineComponent({
     const confirmDeleteDialog = ref(false);
     const productToDelete = ref(null);
     const file = ref(null);
-    const servicesOptions = ref([])
+    const servicesOptions = ref([]);
 
     const form = reactive({
       name: "",
@@ -25,7 +26,7 @@ export default defineComponent({
       problemDescription: "",
       technicalDescription: "",
       equipment: "",
-      budget: false,
+      budget: true,
       isActive: true,
     });
 
@@ -53,10 +54,10 @@ export default defineComponent({
 
     const getServices = async () => {
       loading.value = true;
-      await Services.getServices().then(resp => {
-        resp.map(a =>{
-          servicesOptions.value.push({label: a.name, value: a.id});
-        })
+      await Services.getServices().then((resp) => {
+        resp.map((a) => {
+          servicesOptions.value.push({ label: a.name, value: a.id, price: a.price, });
+        });
       });
       loading.value = false;
     };
@@ -86,6 +87,22 @@ export default defineComponent({
       }
       await getOrders();
       isOpen.value = false;
+
+      generatePDF();
+    };
+
+    const generatePDF = () => {
+      const doc = new jsPDF();
+      doc.text("Detalhes da Ordem", 10, 10);
+      doc.text(`Nome: ${form.name}`, 10, 20);
+      doc.text(`Telefone: ${form.phone}`, 10, 30);
+      doc.text(`Descrição do Problema: ${form.problemDescription}`, 10, 40);
+      doc.text(`Equipamento: ${form.equipment}`, 10, 50);
+      doc.text(`Avarias: ${form.mistakes}`, 10, 60);
+      doc.text(`Orçamento: ${form.budget ? "Sim" : "Não"}`, 10, 70);
+      doc.text(`Valor Total: ${form.totalValue}`, 10, 80);
+
+      doc.save("ordem.pdf");
     };
 
     const confirmDelete = (selectedOrder) => {
@@ -109,7 +126,7 @@ export default defineComponent({
         technicalDescription: "",
         equipment: "",
         idService: null,
-        budget: false,
+        budget: true,
         isActive: true,
       });
       file.value = null;
@@ -121,6 +138,20 @@ export default defineComponent({
         file.value = uploadedFile;
       }
     };
+
+    watch(
+      () => form.idService,
+      (newServiceId) => {
+        if (!form.budget && newServiceId) {
+          const selectedService = servicesOptions.value.find(
+            (service) => service.value === newServiceId.value
+          );
+          if (selectedService) {
+            form.totalValue = selectedService.price;
+          }
+        }
+      }
+    );
 
     onMounted(() => {
       getOrders();
@@ -152,6 +183,7 @@ export default defineComponent({
   },
 });
 </script>
+
 <template>
   <div>
     <q-card class="q-ma-md" >
@@ -175,7 +207,7 @@ export default defineComponent({
               flat
               dense
               icon="edit"
-              @click="editProduct(props.row)"
+              @click="editOrder(props.row)"
               color="blue"
             />
             <q-btn
@@ -239,13 +271,6 @@ export default defineComponent({
               type="textarea"
               required
             />
-            <div class="q-mt-md">
-              <q-toggle
-                v-model="form.budget"
-                color="green"
-                label="Fazer orçamento"
-              />
-            </div>
             <q-select
               class="q-mt-md"
               outlined
@@ -258,7 +283,23 @@ export default defineComponent({
               type="text"
               required
             />
+            <q-input
+              class="q-mt-md"
+              outlined
+              rounded
+              label="Avarias"
+              v-model="form.mistakes"
+              type="text"
+            />
+            <div class="q-mt-md">
+              <q-toggle
+                v-model="form.budget"
+                color="green"
+                label="Fazer orçamento"
+              />
+            </div>
             <q-select
+              v-if="!form.budget"
               class="q-mt-md"
               outlined
               rounded
@@ -270,6 +311,15 @@ export default defineComponent({
               type="text"
               required
             />
+            <q-input
+              v-model="form.totalValue"
+              class="q-mt-md"
+              outlined
+              rounded
+              v-if="!form.budget && form.idService"
+              readonly
+            />
+
             <q-btn type="submit" rounded label="Salvar" color="primary" class="q-mt-md" />
           </q-form>
         </q-card-section>
@@ -283,7 +333,7 @@ export default defineComponent({
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Cancelar" color="primary" v-close-popup />
-          <q-btn flat label="Excluir" color="red" @click="deleteProduct" />
+          <q-btn flat label="Excluir" color="red" @click="deleteOrder" />
         </q-card-actions>
       </q-card>
     </q-dialog>

@@ -130,8 +130,20 @@ export default defineComponent({
       </q-table>
     </q-card>
 
-    <q-dialog v-model="isOpen">
+    <q-dialog
+      v-model="isOpen"
+      persistent
+      maximized
+      transition-show="slide-up"
+      transition-hide="slide-down"
+    >
       <q-card>
+        <q-bar>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip class="bg-white text-primary">Close</q-tooltip>
+          </q-btn>
+        </q-bar>
         <q-card-section class="row items-center q-pb-none text-h6">
           {{ isEdit ? "Editar" : "Cadastrar" }} PEDIDO
         </q-card-section>

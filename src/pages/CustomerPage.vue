@@ -138,6 +138,12 @@ export default defineComponent({
 
     <q-dialog v-model="isOpen" persistent>
       <q-card>
+        <q-bar>
+          <q-space />
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip class="bg-white text-primary">Close</q-tooltip>
+          </q-btn>
+        </q-bar>
         <q-card-section class="row items-center q-pb-none text-h6">
           {{ isEdit ? "Editar" : "Cadastrar" }} Cliente
         </q-card-section>
