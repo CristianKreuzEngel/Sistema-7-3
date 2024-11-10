@@ -40,6 +40,7 @@
           flat
           label="Sair"
           icon="logout"
+          @click="logout"
         />
       </q-list>
     </q-drawer>
@@ -53,6 +54,7 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import EssentialLink from 'components/EssentialLink.vue'
+import { auth } from '../services/auth';
 
 const linksList = [
   {
@@ -106,7 +108,7 @@ export default defineComponent({
       this.leftDrawerOpen = !this.leftDrawerOpen
     },
     async logout() {
-      await this.auth.logout();
+      await auth.logout();
     }
   }
 })
