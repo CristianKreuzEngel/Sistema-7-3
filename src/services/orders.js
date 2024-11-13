@@ -11,13 +11,8 @@ export const order = {
   },
   async createOrder(data) {
     try {
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        withCredentials: true
-      };
-      return await api.post('/orders/create-order', data, config);
+      console.log(data)
+      return await api.post('/orders/create-order', data, {withCredentials: true});
     } catch (err) {
       throw err;
     }

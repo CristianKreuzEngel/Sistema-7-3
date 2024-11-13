@@ -21,6 +21,7 @@ export default defineComponent({
       name: "",
       phone: "",
       totalValue: 0,
+      expectedDate: "",
       accessories: "",
       mistakes: "",
       problemDescription: "",
@@ -42,7 +43,7 @@ export default defineComponent({
       { name: "price", label: "Preço", field: "price", sortable: true },
       { name: "voltage", label: "Voltagem", field: "voltage" },
       { name: "cod", label: "Código", field: "cod" },
-      { name: "isActive", label: "Status", field: "isActive" },
+      { name: "status", label: "Status", field: "isActive" },
       { name: "actions", label: "Ações", field: "actions", sortable: false },
     ];
 
@@ -75,15 +76,10 @@ export default defineComponent({
     };
 
     const submitForm = async () => {
-      const formData = new FormData();
       if (isEdit.value) {
         await order.updateOrder(form);
       } else {
-        formData.append("name", form.name);
-        formData.append("price", form.totalValue);
-        formData.append("equipment", form.equipment);
-        formData.append("file", file.value);
-        await order.createOrder(formData);
+        await order.createOrder(form);
       }
       await getOrders();
       isOpen.value = false;
@@ -121,6 +117,7 @@ export default defineComponent({
         name: "",
         phone: "",
         totalValue: 0,
+        expectedDate: "",
         accessories: "",
         problemDescription: "",
         technicalDescription: "",
@@ -152,6 +149,13 @@ export default defineComponent({
         }
       }
     );
+    watch(
+      () => form.equipment,
+      (newValue) => {
+        console.log("Equipamento selecionado:", newValue);
+      }
+    );
+
 
     onMounted(() => {
       getOrders();
@@ -196,11 +200,6 @@ export default defineComponent({
         bordered
         :loading="loading"
       >
-        <template v-slot:body-cell-isActive="props">
-          <q-td :props="props">
-            {{ props.row.isActive ? "Ativo" : "Inativo" }}
-          </q-td>
-        </template>
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <q-btn
@@ -242,26 +241,30 @@ export default defineComponent({
         </q-card-section>
         <q-card-section>
           <q-form @submit="submitForm" class="q-my-md">
-            <q-input
-              class="q-mt-md"
-              outlined
-              rounded
-              label="Nome completo"
-              v-model="form.name"
-              type="text"
-              required
-            />
+            <div class="row q-col-gutter-md">
+              <div class="col-6">
+                <q-input
+                  outlined
+                  rounded
+                  label="Nome completo"
+                  v-model="form.name"
+                  type="text"
+                  required
+                />
+              </div>
+              <div class="col-6">
+                <q-input
+                  outlined
+                  rounded
+                  label="Telefone/celular"
+                  v-model="form.phone"
+                  mask="+55 (##) #####-####"
+                  type="tel"
+                  required
+                />
+              </div>
+            </div>
 
-            <q-input
-              class="q-mt-md"
-              outlined
-              rounded
-              label="Telefone/celular"
-              v-model="form.phone"
-              mask="+55 (##) #####-####"
-              type="tel"
-              required
-            />
             <q-input
               class="q-mt-md"
               outlined
@@ -271,33 +274,53 @@ export default defineComponent({
               type="textarea"
               required
             />
-            <q-select
-              class="q-mt-md"
-              outlined
-              rounded
-              :options="equipmentOptions"
-              option-value="value"
-              option-label="label"
-              label="Equipamento"
-              v-model="form.equipment"
-              type="text"
-              required
-            />
-            <q-input
-              class="q-mt-md"
-              outlined
-              rounded
-              label="Avarias"
-              v-model="form.mistakes"
-              type="text"
-            />
-            <div class="q-mt-md">
-              <q-toggle
-                v-model="form.budget"
-                color="green"
-                label="Fazer orçamento"
+
+            <div class="row q-col-gutter-md q-mt-md">
+              <div class="col-6">
+                  <q-select
+                outlined
+                rounded
+                :options="equipmentOptions"
+                option-value="value"
+                option-label="label"
+                label="Equipamento"
+                v-model="form.equipment"
+                emit-value
+                type="text"
+                required
               />
+
+              </div>
+              <div class="col-6">
+                <q-input
+                  outlined
+                  rounded
+                  label="Avarias"
+                  v-model="form.mistakes"
+                  type="text"
+                />
+              </div>
             </div>
+
+            <div class="row q-col-gutter-md q-mt-md">
+              <div class="col-1">
+                <q-input
+                  outlined
+                  rounded
+                  type="date"
+                  v-model="form.expectedDate"
+                  label="Data esperada"
+                />
+              </div>
+              <div class="col-6">
+                <q-toggle
+                  v-model="form.budget"
+                  color="green"
+                  label="Fazer orçamento"
+                />
+              </div>
+            </div>
+
             <q-select
               v-if="!form.budget"
               class="q-mt-md"
@@ -323,6 +346,7 @@ export default defineComponent({
             <q-btn type="submit" rounded label="Salvar" color="primary" class="q-mt-md" />
           </q-form>
         </q-card-section>
+
       </q-card>
     </q-dialog>
 

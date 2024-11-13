@@ -15,6 +15,7 @@
   "dependencies": {
     "@quasar/extras": "^1.16.4",
     "axios": "^1.2.1",
+    "chart.js": "^4.4.6",
     "js-cookie": "^3.0.5",
     "jspdf": "^2.5.2",
     "pinia": "^2.0.11",
